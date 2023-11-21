@@ -1,11 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotten Tomatoes Movie Info</title>
 </head>
 <body>
-	This is HTML!
+  <h1>Rotten Tomatoes Movie Info</h1>
+  <form id="movieForm">
+    <label for="movieName">Enter Movie Name:</label>
+    <input type="text" id="movieName" name="movieName" required>
+    <button type="button" onclick="getMovieInfo()">Get Movie Info</button>
+  </form>
+  <div id="movieInfoContainer"></div>
+
+  <script>
+    async function getMovieInfo() {
+      const movieName = document.getElementById('movieName').value;
+      const response = await fetch('/getMovieInfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `movieName=${encodeURIComponent(movieName)}`,
+      });
+      const result = await response.text();
+      document.getElementById('movieInfoContainer').innerHTML = result;
+    }
+  </script>
 </body>
 </html>
