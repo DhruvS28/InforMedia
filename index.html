@@ -1,32 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rotten Tomatoes Movie Info</title>
-</head>
-<body>
-  <h1>Rotten Tomatoes Movie Info</h1>
-  <form id="movieForm">
-    <label for="movieName">Enter Movie Name:</label>
-    <input type="text" id="movieName" name="movieName" required>
-    <button type="button" onclick="getMovieInfo()">Get Movie Info</button>
-  </form>
-  <div id="movieInfoContainer"></div>
 
-  <script>
-    async function getMovieInfo() {
-      const movieName = document.getElementById('movieName').value;
-      const response = await fetch('/getMovieInfo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `movieName=${encodeURIComponent(movieName)}`,
-      });
-      const result = await response.text();
-      document.getElementById('movieInfoContainer').innerHTML = result;
-    }
-  </script>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link type="text/css" rel="stylesheet" href='css/index.css'>
+
+	<title>Informative Media</title>
+</head>
+
+<body>
+	<section class="header-section">
+		<div class="header-bar">
+			
+		</div>
+	</section>
+
+	<section class="search-section">
+		<div class="search-wrap">
+			<div class="search-bar">
+				<input value="iro" type="text" class="search-input" placeholder="Enter Media" oninput="fetchMediaData(this.value)">
+				<button type="submit" class="searchButton">
+					<i class="fa fa-search">></i>
+				</button>
+			</div>
+			<div class="search-results" style="display: none;">
+			</div>
+		</div>
+	</section>
+
+	<br>
+	<hr>
+	<br>
+
+
+	<section class="display-section-imdb">
+		<div class="display-info">
+			<p class="imdb-title"></p>
+			<p class="imdb-year"></p>
+			<p class="imdb-rating"></p>
+			<p class="imdb-genre"></p>
+			<p class="imdb-runtime"></p>
+			<p class="imdb-plot"></p>
+			<p class="imdb-url"></p>
+		</div>
+	</section>
+
+	<!-- <h1>Rotten Tomatoes Movie Info</h1>
+	<form id="movieForm">
+		<label for="movieName">Enter Movie Name:</label>
+		<input type="text" id="movieName" name="movieName" required>
+		<button type="button" onclick="getMovieInfo()">Get Movie Info</button>
+	</form>
+	<div id="movieInfoContainer"></div>
+
+	<script>
+		async function getMovieInfo() {
+			const movieName = document.getElementById('movieName').value;
+			const response = await fetch('/getMovieInfo', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: `movieName=${encodeURIComponent(movieName)}`,
+			});
+			const result = await response.text();
+			document.getElementById('movieInfoContainer').innerHTML = result;
+		}
+	</script> -->
+
+	<script src="javascript/index.js"></script>
 </body>
+
 </html>
