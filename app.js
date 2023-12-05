@@ -31,10 +31,15 @@ const limiter = rateLimit({
 
 // https://github.com/tuhinpal/imdb-api
 app.get('/search/:mediaSearch', async (req, res) => {
-
 	const search = req.params.mediaSearch;
+	const maxRetries = 3;
 
-	// https://imdb-api.projects.thetuhin.com/search?query=ironman
+	// Function to perform the API request
+	const performSearchRequest = async () => {
+		const searchResponse = await axios.get(`https://imdb-api.projects.thetuhin.com/search?query=${search}`);
+		return searchResponse.data.results;
+	};
+
 	try {
 		// Check if the result is already in the cache
 		const cachedResult = cache.get(search);
@@ -42,14 +47,24 @@ app.get('/search/:mediaSearch', async (req, res) => {
 			console.log('Using cached result for', search);
 			res.json(cachedResult);
 		} else {
-			// If not in the cache, make the API request and store the result in the cache
-			const searchResponse = await axios.get(`https://imdb-api.projects.thetuhin.com/search?query=${search}`);
-			const mediaResults = searchResponse.data.results;
+			// Retry logic
+			for (let retry = 1; retry <= maxRetries; retry++) {
+				try {
+					const mediaResults = await performSearchRequest();
+					// Store the result in the cache with the search query as the key
+					cache.set(search, mediaResults);
+					res.json(mediaResults);
+					return; // Break the loop if successful
+				} catch (error) {
+					console.error(`Error on attempt ${retry}:`, error.message);
+					if (retry < maxRetries) {
+						console.log(`Retrying... (${retry}/${maxRetries})`);
+					}
+				}
+			}
 
-			// Store the result in the cache with the search query as the key
-			cache.set(search, mediaResults);
-
-			res.json(mediaResults);
+			// If all retries fail, return Internal Server Error
+			res.status(500).send('Internal Server Error');
 		}
 	} catch (error) {
 		console.log('Search Error', error.name);
