@@ -36,7 +36,7 @@ app.get('/search/:mediaSearch', async (req, res) => {
 
 	// Function to perform the API request
 	const performSearchRequest = async () => {
-		const searchResponse = await axios.get(`https://imdb-api.projects.thetuhin.com/search?query=${search}`);
+		const searchResponse = await axios.get(`https://imdb-api.28dhruv03.workers.dev/search?query=${search}`);
 		return searchResponse.data.results;
 	};
 
@@ -84,7 +84,7 @@ app.get('/title/:mediaID', async (req, res) => {
 			res.json(cachedResult);
 		} else {
 			// If not in the cache, make the API request and store the result in the cache
-			const idResponse = await axios.get(`https://imdb-api.projects.thetuhin.com/title/${id}`);
+			const idResponse = await axios.get(`https://imdb-api.28dhruv03.workers.dev/title/${id}`);
 			const result = idResponse.data;
 
 			// Store the result in the cache with the title ID as the key
