@@ -86,35 +86,42 @@ async function clickedMediaInfo(item) {
 	document.getElementsByClassName('search-results')[0].style.display = 'none';
 
 	var mediaInfo;
-	// Fetch media data from the server
-	await fetch(`/title/${item.id}`)
+	// Fetch media data from the server (for imdb)
+	await fetch(`/imdb/media/${item.id}`)
 		.then(response => response.json())
 		.then(data => {
 			mediaInfo = data;
 		})
 		.catch(error => console.error('Error fetching media data:', error));
 
-		
-	// const displaySection = document.querySelector('.display-section');
-	const imdbTitle = document.querySelector('.imdb-title');
-	const imdbYear = document.querySelector('.imdb-year');
-	const imdbRating = document.querySelector('.imdb-rating');
-	const imdbGenre = document.querySelector('.imdb-genre');
-	const imdbRuntime = document.querySelector('.imdb-runtime');
-	const imdbPlot = document.querySelector('.imdb-plot');
-	const imdbUrl = document.querySelector('.imdb-url');
 
+	document.querySelector('.display-info-imdb').innerHTML = `
+		<p class="imdb-title"><b>Name:</b> ${mediaInfo.title}</p>
+		<p class="imdb-year"><b>Year</b>: ${mediaInfo.year}</p>
+		<p class="imdb-rating"><b>Ratings:</b> ${[mediaInfo.rating.star, mediaInfo.rating.count].join(' by ')}</p>
+		<p class="imdb-genre"><b>Genres:</b> ${mediaInfo.genre.join(', ')}</p>
+		<p class="imdb-runtime"><b>Runtime:</b> ${mediaInfo.runtime}</p>
+		<p class="imdb-plot">${mediaInfo.plot}</p>
+		<p class="imdb-url" style="display:none;">${mediaInfo.imdb}</p>
+		`
 
-	imdbTitle.innerHTML = mediaInfo.title;
-	imdbYear.innerHTML = mediaInfo.year;
-	imdbRating.innerHTML = [mediaInfo.rating.star, mediaInfo.rating.count].join(', ');
-	imdbRuntime.innerHTML = mediaInfo.genre.join(', ');
-	imdbRuntime.innerHTML = mediaInfo.runtime;
-	imdbPlot.innerHTML = mediaInfo.plot;
-	imdbUrl.innerHTML = mediaInfo.imdb;
+	// Fetch media data from the server (for imdb)
+	await fetch(`/rottom/media/${mediaInfo.title}`)
+		.then(response => response.json())
+		.then(data => {
+			console.log("data")
+			console.log(data)
+			mediaInfo = data;
+		})
+		.catch(error => console.error('Error fetching media data:', error));
 
-	// console.log(`Selected: ${item.title}, ${mediaInfo.rating.star},
-	// \nhttps://www.imdb.com/title/${mediaInfo.id}`);
-	
+	document.querySelector('.display-info-rottom').innerHTML = `
+		<p class="rottom-critic"><b>Critic Score:</b> ${mediaInfo.tomatometer}</p>
+		<p class="rottom-audience"><b>Audience Score:</b> ${mediaInfo.audience_score}</p>
+		<p class="rottom-title" style="display:none;">${mediaInfo.name}</p>
+		<p class="rottom-year" style="display:none;"><b>Year:</b> ${mediaInfo.year}</p>
+		<p class="rottom-genre" style="display:none;"><b>Genre:</b> ${mediaInfo.genres.join(', ')}</p>
+		<p class="rottom-runtime" style="display:none;"><b>Runtime:</b> ${mediaInfo.duration}</p>
+		`
 }
 

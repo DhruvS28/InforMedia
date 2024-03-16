@@ -19,7 +19,7 @@
 	<section class="search-section">
 		<div class="search-wrap">
 			<div class="search-bar">
-				<input value="iro" type="text" class="search-input" placeholder="Enter Media" oninput="fetchMediaData(this.value)">
+				<input value="" type="text" class="search-input" placeholder="Enter Media" oninput="fetchMediaData(this.value)">
 				<button type="submit" class="searchButton">
 					<i class="fa fa-search">></i>
 				</button>
@@ -35,39 +35,16 @@
 
 
 	<section class="display-section-imdb">
-		<div class="display-info">
-			<p class="imdb-title"></p>
-			<p class="imdb-year"></p>
-			<p class="imdb-rating"></p>
-			<p class="imdb-genre"></p>
-			<p class="imdb-runtime"></p>
-			<p class="imdb-plot"></p>
-			<p class="imdb-url"></p>
+		<div class="display-info-imdb">
 		</div>
 	</section>
 
-	<!-- <h1>Rotten Tomatoes Movie Info</h1>
-	<form id="movieForm">
-		<label for="movieName">Enter Movie Name:</label>
-		<input type="text" id="movieName" name="movieName" required>
-		<button type="button" onclick="getMovieInfo()">Get Movie Info</button>
-	</form>
-	<div id="movieInfoContainer"></div>
+	<hr>
 
-	<script>
-		async function getMovieInfo() {
-			const movieName = document.getElementById('movieName').value;
-			const response = await fetch('/getMovieInfo', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body: `movieName=${encodeURIComponent(movieName)}`,
-			});
-			const result = await response.text();
-			document.getElementById('movieInfoContainer').innerHTML = result;
-		}
-	</script> -->
+	<section class="display-section-rottom">
+		<div class="display-info-rottom">
+		</div>
+	</section>
 
 	<script src="javascript/index.js"></script>
 </body>

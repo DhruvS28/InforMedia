@@ -26,8 +26,6 @@ const limiter = rateLimit({
 	},
 });
 
-// app.use('/search/:mediaSearch', limiter);
-// app.use('/title/:mediaID', limiter);
 
 // https://github.com/tuhinpal/imdb-api
 app.get('/search/:mediaSearch', async (req, res) => {
@@ -73,8 +71,8 @@ app.get('/search/:mediaSearch', async (req, res) => {
 	}
 });
 
-app.get('/title/:mediaID', async (req, res) => {
-	const id = req.params.mediaID;
+app.get('/imdb/media/:mediaId', async (req, res) => {
+	const id = req.params.mediaId;
 
 	try {
 		// Check if the result is already in the cache
@@ -100,75 +98,40 @@ app.get('/title/:mediaID', async (req, res) => {
 });
 
 
-app.post('/getMovieInfo', async (req, res) => {
-	const movieName = req.body.movieName;
-
-	// Check if movie information is in the cache
-	const cachedMovieInfo = movieCache.get(movieName);
-	if (cachedMovieInfo) {
-		return res.send(cachedMovieInfo);
-	}
+app.get('/rottom/media/:mediaId', async (req, res) => {
+	const id = req.params.mediaId;
 
 	try {
-		const response = await axios.get(`https://rotten-tomatoes-api.ue.r.appspot.com/movie/${movieName}`);
-		const movieInfo = response.data;
-		let tableRows = '';
-
-		if (Array.isArray(movieInfo.movies)) {
-			// Handle multiple movies
-			const promises = movieInfo.movies.map(async (movie) => {
-				return `
-          <tr>
-            <td>
-              <p>Title: ${movie.name}</p>
-            </td>
-            <td>
-              <p>Audience: ${movie.audience_score}</p>
-              <p>Tomato: ${movie.tomatometer}</p>
-              <p>Genres: ${movie.genres.join(', ')}</p>
-              <p>Duration: ${movie.duration}</p>
-              <p>Release Year: ${movie.year}</p>
-            </td>
-          </tr>
-        `;
-			});
-
-			// Execute all promises concurrently
-			const rows = await Promise.all(promises);
-			tableRows = rows.join('');
+		// Check if the result is already in the cache
+		const cachedResult = cache.get(id);
+		if (cachedResult) {
+			console.log('Using cached result for title ID:', id);
+			res.json(cachedResult);
 		} else {
-			// Handle a single movie
-			tableRows = `
-        <tr>
-          <td>
-            <p>Title: ${movieInfo.name}</p>
-          </td>
-          <td>
-            <p>Audience: ${movieInfo.audience_score}</p>
-            <p>Tomato: ${movieInfo.tomatometer}</p>
-            <p>Genres: ${movieInfo.genres.join(', ')}</p>
-            <p>Duration: ${movieInfo.duration}</p>
-            <p>Release Year: ${movieInfo.year}</p>
-          </td>
-        </tr>
-      `;
+			// If not in the cache, make the API request and store the result in the cache
+			const idResponse = await axios.get(`https://rotten-tomatoes-api.ue.r.appspot.com/search/${id}`);
+			const result = idResponse.data.movies;
+			var num = 0;
+			for (let movie of result) {
+				console.log(movie.name);
+				console.log(id);
+				console.log(movie.name === id);
+				if(movie.name === id) break;
+				num++;
+			}
+
+			// Store the result in the cache with the title ID as the key
+			cache.set(id, result[num]);
+
+			res.json(result[num]);
 		}
-
-		const htmlResponse = `
-      <h2>Movies Information</h2>
-      <table border="1">
-        ${tableRows}
-      </table>
-    `;
-
-		// Cache the movie information
-		movieCache.set(movieName, htmlResponse);
-
-		res.send(htmlResponse);
-	} catch (error) {
-		res.send('Error fetching movie information. Please try again.');
+	} catch (e) {
+		console.log('Title Error', e.name);
+		console.log('Title Error', e.message);
+		res.status(500).send('Internal Server Error');
 	}
 });
+
 
 app.listen(port, () => {
 	console.log(`Server is running at http://localhost:${port}`);
