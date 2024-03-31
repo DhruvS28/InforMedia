@@ -111,6 +111,17 @@ function displayResults(data) {
 	});
 }
 
+// getMediaInfo({
+//     "id": "tt0371746",
+//     "title": "Iron Man",
+//     "year": 2008,
+//     "type": "movie",
+//     "image": "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_UY396_CR6,0,267,396_AL_.jpg",
+//     "image_large": "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_.jpg",
+//     "api_path": "/title/tt0371746",
+//     "imdb": "https://www.imdb.com/title/tt0371746"
+// });
+
 number = 0;
 async function getMediaInfo(item) {
 	console.log('Displaying Media...');
@@ -158,11 +169,10 @@ async function getMediaInfo(item) {
 		.catch(error => {
 			console.error('Error fetching template:', error);
 		});
-
-	await fetch(`/rottom/media/${mediaInfo.title}`)
+		console.log(mediaInfo)
+	await fetch(`/rottom/media/${mediaInfo.contentType}/${mediaInfo.title}`)
 		.then(response => response.json())
 		.then(data => {
-			console.log(data)
 			document.querySelector('.rottom-score-critic').innerHTML = `${data.tomatometer}`;
 			document.querySelector('.rottom-score-audience').innerHTML = `${data.audience_score}`;
 		})

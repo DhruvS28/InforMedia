@@ -100,10 +100,14 @@ app.get('/imdb/media/:mediaId', async (req, res) => {
 });
 
 
-app.get('/rottom/media/:mediaId', async (req, res) => {
+app.get('/rottom/media/:contentType/:mediaId', async (req, res) => {
+	const type = req.params.contentType;
 	const id = req.params.mediaId;
-	const formattedMediaId = id.replace(/\s/g, '_');
-	const url = `https://www.rottentomatoes.com/m/${formattedMediaId}`;
+	const formattedMediaId = id.replace(/:/g, '').replace(/-/g, '').replace(/ /g, '_');
+	
+	let url;
+	if (type === 'movie') url = `https://www.rottentomatoes.com/m/${formattedMediaId}`;
+	else if (type === 'tvSeries') url = `https://www.rottentomatoes.com/tv/${formattedMediaId}`;
 
 	try {
 		// Fetch HTML content from the provided URL
@@ -112,20 +116,31 @@ app.get('/rottom/media/:mediaId', async (req, res) => {
 		// Load HTML content into Cheerio
 		const $ = cheerio.load(html);
 
+
 		// Function to query data-qa attributes
-		const query = (selector) => {
+		const queryMovie = (selector) => {
 			return $('#scoreboard')[0].attributes[`${selector}`].value;
 		};
+		const queryTv = (selector) => {
+			return $(`media-scorecard [slot="${selector}"]`).html();
+		};
 
-		// Extract the required data
-		const tomatometer = query(8) !== '' ? query(8) : '-';
-		const audienceScore = query(1) !== '' ? query(1) : '-';
+		let tomatometer, audienceScore;
+		if (type === 'movie') {
+			// Extract the required data
+			tomatometer = queryMovie(8) !== '' || null ? queryMovie(8) : '-';
+			audienceScore = queryMovie(1) !== '' || null ? queryMovie(1) : '-';
+		}
+		else {
+			tomatometer = queryTv('criticsScore') !== '' || null ? queryTv('criticsScore') : '-';
+			audienceScore = queryTv('audienceScore') !== '' || null ? queryTv('audienceScore') : '-';
+		}
 
 		// Return the data as an array
 		res.json({ "tomatometer": tomatometer, "audience_score": audienceScore });
 	} catch (error) {
 		console.error('Error:', error);
-		return null;
+		res.json({ "tomatometer": '-', "audience_score": '-' });
 	}
 });
 
