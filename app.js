@@ -1,5 +1,6 @@
 const express = require('express');
 const axios = require('axios');
+const cheerio = require('cheerio');
 const NodeCache = require('node-cache');
 
 const app = express();
@@ -20,15 +21,15 @@ app.get('/', (req, res) => {
 const rateLimit = require("express-rate-limit");
 const limiter = rateLimit({
 	windowMs: 5 * 1000,
-	max: 30, // limit each IP to 10 requests per windowMs
+	max: 10, // limit each IP to 10 requests per windowMs
 	handler: (req, res) => {
-		res.status(429).json(409);
+		res.status(429).json({ status: 429 });
 	},
 });
 
 
 // https://github.com/tuhinpal/imdb-api
-app.get('/search/:mediaSearch', async (req, res) => {
+app.get('/search/:mediaSearch', limiter, async (req, res) => {
 	const search = req.params.mediaSearch;
 	const maxRetries = 3;
 
@@ -71,6 +72,7 @@ app.get('/search/:mediaSearch', async (req, res) => {
 	}
 });
 
+
 app.get('/imdb/media/:mediaId', async (req, res) => {
 	const id = req.params.mediaId;
 
@@ -100,35 +102,30 @@ app.get('/imdb/media/:mediaId', async (req, res) => {
 
 app.get('/rottom/media/:mediaId', async (req, res) => {
 	const id = req.params.mediaId;
+	const formattedMediaId = id.replace(/\s/g, '_');
+	const url = `https://www.rottentomatoes.com/m/${formattedMediaId}`;
 
 	try {
-		// Check if the result is already in the cache
-		const cachedResult = cache.get(id);
-		if (cachedResult) {
-			console.log('Using cached result for title ID:', id);
-			res.json(cachedResult);
-		} else {
-			// If not in the cache, make the API request and store the result in the cache
-			const idResponse = await axios.get(`https://rotten-tomatoes-api.ue.r.appspot.com/search/${id}`);
-			const result = idResponse.data.movies;
-			var num = 0;
-			for (let movie of result) {
-				console.log(movie.name);
-				console.log(id);
-				console.log(movie.name === id);
-				if(movie.name === id) break;
-				num++;
-			}
+		// Fetch HTML content from the provided URL
+		const response = await axios.get(url);
+		const html = response.data;
+		// Load HTML content into Cheerio
+		const $ = cheerio.load(html);
 
-			// Store the result in the cache with the title ID as the key
-			cache.set(id, result[num]);
+		// Function to query data-qa attributes
+		const query = (selector) => {
+			return $('#scoreboard')[0].attributes[`${selector}`].value;
+		};
 
-			res.json(result[num]);
-		}
-	} catch (e) {
-		console.log('Title Error', e.name);
-		console.log('Title Error', e.message);
-		res.status(500).send('Internal Server Error');
+		// Extract the required data
+		const tomatometer = query(8) !== '' ? query(8) : '-';
+		const audienceScore = query(1) !== '' ? query(1) : '-';
+
+		// Return the data as an array
+		res.json({ "tomatometer": tomatometer, "audience_score": audienceScore });
+	} catch (error) {
+		console.error('Error:', error);
+		return null;
 	}
 });
 

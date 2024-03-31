@@ -23,7 +23,7 @@
 	--clr-img-border: #202020;
 
 	/* header */
-	--clr-background: #ececec;
+	--clr-background: #f2f2f2;
 	/* search stuff */
 	--clr-search: #FC6600;
 	/* skills */
@@ -56,7 +56,7 @@
 } */
 
 body {
-	/* background: #f2f2f2; */
+	background: var(--clr-background);
 	margin: 0;
 }
 
@@ -65,7 +65,7 @@ body {
 
 .header-section {
 	min-height: 10vh;
-	background-color: var(--clr-background);
+	/* background-color: var(--clr-background); */
 	margin-bottom: 10px;
 	/* width: 100%; */
 	/* height: 10%; */
@@ -75,122 +75,3 @@ body {
 	/* width: 100%; */
 	/* height: 10%; */
 /* } */
-
-
-/*     Search     */
-
-.search-section {
-	display: flex;
-	justify-content: center;
-}
-
-.search-wrap, .search-results {
-	width: 50%;
-}
-
-.search-bar {
-	width: 100%;
-	display: flex;
-	position: relative;
-	/* top: 3px; */
-}
-
-.search-input {
-	width: 100%;
-	border: 3px solid var(--clr-search);
-	border-right: none;
-	padding: 5px;
-	border-radius: 5px 0 0 5px;
-	outline: none;
-}
-
-/* .search-input:focus{
-	color: #00B4CC;
-  } */
-
-.searchButton {
-	width: 50px;
-	border: 1px solid var(--clr-search);
-	background: var(--clr-search);
-	color: #fff;
-	border-radius: 0 5px 5px 0;
-	cursor: pointer;
-	font-size: 20px;
-}
-
-.search-dropdown>* {
-	width: 100%;
-	cursor: pointer;
-}
-
-.search-results {
-	border: 3px solid var(--clr-search);
-	border-radius: 5px;
-	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-	overflow: hidden;
-	/* position: relative; */
-	/* bottom: 3px; */
-	position: absolute;
-  }
-  
-  .search-results-item {
-	cursor: default;
-	display: flex;
-	color: black;
-	text-decoration: none;
-	padding: 5px 10px;
-	margin: 0;
-	background-color: white;
-	align-items: center; /* Center vertically */
-    /*justify-content: center; /* Center horizontally */
-}
-
-.search-results-item > p {
-	margin: 0;
-}
-.search-results-item:hover {
-	background-color: var(--clr-background);
-  }
-  
-.search-item-title, .search-item-year {
-	text-align: center;
-	flex: 1;
-}
-/* .search-item-year {
-	text-align: center;
-	flex: 1;
-} */
-
-.search-item-img {
-	max-width: 10%;
-}
-/* 
-.search-table-item:hover {
-} */
-
-@media (max-width: 1024px) {
-	.search-item-img {
-		max-width: 15%;
-	}
-
-	/* .search-results { */
-		/* width: 80%; */
-	/* } */
-}
-
-@media (max-width: 512px) {
-	.search-wrap, .search-results {
-		width: 80%;
-	}
-
-	/* .search-results { */
-		/* width: 80%; */
-	/* } */
-}
-
-
-/*     Display     */
-
-.display-info-imdb, .display-info-rottom {
-	margin: 20px;
-}

@@ -4,7 +4,11 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
 	<link type="text/css" rel="stylesheet" href='css/index.css'>
+	<link type="text/css" rel="stylesheet" href='css/search.css'>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 	<title>Informative Media</title>
 </head>
@@ -18,12 +22,12 @@
 
 	<section class="search-section">
 		<div class="search-wrap">
-			<div class="search-bar">
-				<input value="" type="text" class="search-input" placeholder="Enter Media" oninput="fetchMediaData(this.value)">
-				<button type="submit" class="searchButton">
-					<i class="fa fa-search">></i>
+			<form class="search-bar" onsubmit="submitForm(event)">
+				<input value="" type="text" class="search-input" placeholder="Enter Media" oninput="registerInput(this.value)">
+				<button type="submit" class="search-button" id="searchButton">
+					<i class="fa fa-search"></i>
 				</button>
-			</div>
+			</form>
 			<div class="search-results" style="display: none;">
 			</div>
 		</div>
@@ -33,17 +37,7 @@
 	<hr>
 	<br>
 
-
-	<section class="display-section-imdb">
-		<div class="display-info-imdb">
-		</div>
-	</section>
-
-	<hr>
-
-	<section class="display-section-rottom">
-		<div class="display-info-rottom">
-		</div>
+	<section id="content-container">
 	</section>
 
 	<script src="javascript/index.js"></script>

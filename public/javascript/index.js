@@ -14,25 +14,49 @@ document.addEventListener('mousedown', function (event) {
 		if (searchInput.value.length >= INPUT_LENGTH)
 			searchResults.style.display = '';
 		else
-			fetchMediaData('');
+			registerInput('');
 	}
 });
 
+let submitActive = false;
+function submitForm(event) {
+	event.preventDefault(); // This prevents the default form submission behavior (page refresh)
+
+	if (submitActive) return;
+
+	// Fetch the value from the input field
+	var inputValue = document.getElementsByClassName('search-input')[0].value;
+
+	// Now you can use the fetchmedia function with the inputValue
+	if (inputValue === "") return
+	else fetchMediaData(inputValue);
+}
+
+let timerId;
+function registerInput(val) {
+	submitActive = false
+	clearTimeout(timerId);
+	if (val === "")
+		document.getElementsByClassName('search-results')[0].style.display = 'none';
+	else {
+		timerId = setTimeout(function () {
+			fetchMediaData(val);
+		}, 1250);
+	}
+}
 
 function fetchMediaData(media) {
+	submitActive = true;
+	clearTimeout(timerId);
+	console.log("Fetching Media");
 
-	if (media.length < INPUT_LENGTH) {
-		document.getElementsByClassName('search-results')[0].style.display = 'none';
-		return;
-	};
+	// if (media.length < INPUT_LENGTH) return;
 
 	// Fetch media data from the server
 	fetch(`/search/${media}`)
 		.then(response => response.json())
 		.then(data => {
-
-			if (data === 409) {
-				console.log("SLOW DOWN!");
+			if (data.status === 429) {
 				return;
 			}
 			displayResults(data);
@@ -42,7 +66,12 @@ function fetchMediaData(media) {
 
 
 function displayResults(data) {
+	console.log('Displaying Results...');
+
+	if (data.length === 0) return
+
 	const resultsContainer = document.getElementsByClassName('search-results')[0];
+
 	resultsContainer.style.display = '';
 	resultsContainer.innerHTML = '';
 
@@ -66,7 +95,8 @@ function displayResults(data) {
 
 		try {
 			resultItemdiv.addEventListener('click', () => {
-				clickedMediaInfo(item);
+				resultsContainer.style.display = 'none';
+				getMediaInfo(item);
 			});
 		} catch (error) { console.log(error.message) };
 
@@ -81,9 +111,11 @@ function displayResults(data) {
 	});
 }
 
+number = 0;
+async function getMediaInfo(item) {
+	console.log('Displaying Media...');
 
-async function clickedMediaInfo(item) {
-	document.getElementsByClassName('search-results')[0].style.display = 'none';
+	const container = document.getElementById('content-container');
 
 	var mediaInfo;
 	// Fetch media data from the server (for imdb)
@@ -94,34 +126,55 @@ async function clickedMediaInfo(item) {
 		})
 		.catch(error => console.error('Error fetching media data:', error));
 
+	fetch('../media-template.html')
+		.then(response => response.text())
+		.then(template => {
+			const mediaTable = document.createElement('div');
+			mediaTable.setAttribute('id', `content-media-${number}`);
+			const breaker = document.createElement('br');
+			mediaTable.innerHTML = template;
 
-	document.querySelector('.display-info-imdb').innerHTML = `
-		<p class="imdb-title"><b>Name:</b> ${mediaInfo.title}</p>
-		<p class="imdb-year"><b>Year</b>: ${mediaInfo.year}</p>
-		<p class="imdb-rating"><b>Ratings:</b> ${[mediaInfo.rating.star, mediaInfo.rating.count].join(' by ')}</p>
-		<p class="imdb-genre"><b>Genres:</b> ${mediaInfo.genre.join(', ')}</p>
-		<p class="imdb-runtime"><b>Runtime:</b> ${mediaInfo.runtime}</p>
-		<p class="imdb-plot">${mediaInfo.plot}</p>
-		<p class="imdb-url" style="display:none;">${mediaInfo.imdb}</p>
-		`
+			// Append the populated template to the document
+			container.insertBefore(mediaTable, container.firstChild);
+			container.appendChild(breaker);
 
-	// Fetch media data from the server (for imdb)
+			const posterImg = document.createElement('img');
+			posterImg.setAttribute('src', `${mediaInfo.image}`);
+			// posterImg.classList.add('search-item-img');
+
+			document.querySelector('.media-poster').appendChild(posterImg);
+
+			document.querySelector('.imdb-title').innerHTML = `${mediaInfo.title}`;
+			document.querySelector('.imdb-year').innerHTML = `${mediaInfo.year}`;
+			document.querySelector('.imdb-genre').innerHTML = `${mediaInfo.genre.join(',\n')}`;
+			document.querySelector('.imdb-runtime').innerHTML = `${mediaInfo.runtime}`;
+			document.querySelector('.imdb-plot').innerHTML = `${mediaInfo.plot}`;
+
+			document.querySelector('.imdb-score').innerHTML +=
+				`<b>${mediaInfo.rating.star}</b> by ${formatAudienceCount(mediaInfo.rating.count)}`;
+
+			number++;
+		})
+		.catch(error => {
+			console.error('Error fetching template:', error);
+		});
+
 	await fetch(`/rottom/media/${mediaInfo.title}`)
 		.then(response => response.json())
 		.then(data => {
-			console.log("data")
 			console.log(data)
-			mediaInfo = data;
+			document.querySelector('.rottom-score-critic').innerHTML = `${data.tomatometer}`;
+			document.querySelector('.rottom-score-audience').innerHTML = `${data.audience_score}`;
 		})
 		.catch(error => console.error('Error fetching media data:', error));
-
-	document.querySelector('.display-info-rottom').innerHTML = `
-		<p class="rottom-critic"><b>Critic Score:</b> ${mediaInfo.tomatometer}</p>
-		<p class="rottom-audience"><b>Audience Score:</b> ${mediaInfo.audience_score}</p>
-		<p class="rottom-title" style="display:none;">${mediaInfo.name}</p>
-		<p class="rottom-year" style="display:none;"><b>Year:</b> ${mediaInfo.year}</p>
-		<p class="rottom-genre" style="display:none;"><b>Genre:</b> ${mediaInfo.genres.join(', ')}</p>
-		<p class="rottom-runtime" style="display:none;"><b>Runtime:</b> ${mediaInfo.duration}</p>
-		`
 }
 
+const formatAudienceCount = (count) => {
+	if (count >= 1000000) {
+		return `${(count / 1000000).toFixed(1)}M`;
+	} else if (count >= 1000) {
+		return `${(count / 1000).toFixed(0)}k`;
+	} else {
+		return count.toString();
+	}
+};

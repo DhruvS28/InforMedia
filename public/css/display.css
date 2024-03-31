@@ -1,0 +1,51 @@
+/*     Display     */
+.grid-table {
+    display: grid;
+	/* Adjust for border width */
+    grid-template-columns: repeat(5, calc(20% - 2px));
+    grid-template-rows: auto;
+	background-color: #f8f8f8;
+    margin: 20px;
+	gap: 1px;
+}
+
+.grid-table > div {
+	/* outline: 1px solid black; */
+    border: 1px solid black;
+    padding: 5px;
+    text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.media-poster {
+    grid-row: span 3;
+}
+.media-poster img {
+	max-width: 70%;
+}
+
+.imdb-plot {
+    grid-column: span 4;
+}
+
+.imdb-score {
+    grid-column: span 2;
+    background-color: #222;
+    color: white;
+	gap: 5px;
+}
+.rottom-score {
+    grid-column: span 2;
+    background-color: #eee;
+	justify-content: space-evenly !important;
+}
+.rottom-divider {
+    width: 1px;
+    background-color: black;
+    height: 100%;
+}
+.rottom-score img {
+    height: 24px;
+}
