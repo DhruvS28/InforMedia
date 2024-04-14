@@ -61,7 +61,6 @@ app.get('/search/:mediaSearch', limiter, async (req, res) => {
 					}
 				}
 			}
-
 			// If all retries fail, return Internal Server Error
 			res.status(500).send('Internal Server Error');
 		}
@@ -100,22 +99,35 @@ app.get('/imdb/media/:mediaId', async (req, res) => {
 });
 
 
-app.get('/rottom/media/:contentType/:mediaId', async (req, res) => {
-	const type = req.params.contentType;
+app.get('/rottom/media/:contentType/:mediaId/:year', async (req, res) => {
+	const type = req.params.contentType === 'movie' || req.params.contentType === 'tvMovie' ? 'm' : 
+		req.params.contentType === 'tvSeries' ? 'tv' : null;
 	const id = req.params.mediaId;
+	const year = req.params.year;
 	const formattedMediaId = id.replace(/:/g, '').replace(/-/g, '').replace(/ /g, '_');
-	
+	const formattedMediaIdWithYear = `${formattedMediaId}_${year}`;
+
 	let url;
-	if (type === 'movie') url = `https://www.rottentomatoes.com/m/${formattedMediaId}`;
-	else if (type === 'tvSeries') url = `https://www.rottentomatoes.com/tv/${formattedMediaId}`;
+	url = `https://www.rottentomatoes.com/${type}/${formattedMediaIdWithYear}`;
+	console.log(url)
+	let response;
+	try {
+		response = await axios.get(url);
+	} catch (error) {
+		url = `https://www.rottentomatoes.com/${type}/${formattedMediaId}`;
+		console.log(url)
+		try {
+			response = await axios.get(url);
+		} catch (error) {
+			console.error('Error:', error);
+			res.json({ "tomatometer": '-', "audience_score": '-' });
+			return;
+		}
+	}
 
 	try {
-		// Fetch HTML content from the provided URL
-		const response = await axios.get(url);
 		const html = response.data;
-		// Load HTML content into Cheerio
 		const $ = cheerio.load(html);
-
 
 		// Function to query data-qa attributes
 		const queryMovie = (selector) => {
@@ -126,18 +138,15 @@ app.get('/rottom/media/:contentType/:mediaId', async (req, res) => {
 		};
 
 		let tomatometer, audienceScore;
-		if (type === 'movie') {
-			// Extract the required data
+		if (type === 'm') {
 			tomatometer = queryMovie(8) !== '' || null ? queryMovie(8) : '-';
 			audienceScore = queryMovie(1) !== '' || null ? queryMovie(1) : '-';
-		}
-		else {
+		} else if (type === 'tv') {
 			tomatometer = queryTv('criticsScore') !== '' || null ? queryTv('criticsScore') : '-';
 			audienceScore = queryTv('audienceScore') !== '' || null ? queryTv('audienceScore') : '-';
 		}
 
-		// Return the data as an array
-		res.json({ "tomatometer": tomatometer, "audience_score": audienceScore });
+		res.json({ "tomatometer": tomatometer, "audience_score": audienceScore, "url": url});
 	} catch (error) {
 		console.error('Error:', error);
 		res.json({ "tomatometer": '-', "audience_score": '-' });

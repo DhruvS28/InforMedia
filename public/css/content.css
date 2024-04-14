@@ -1,0 +1,132 @@
+/*     Display     */
+
+.grid-table {
+	display: grid;
+	grid-template-columns: repeat(5, calc(20%));
+	grid-template-rows: auto;
+	background-color: #eee;
+	margin: 20px;
+	border-radius: 10px;
+}
+
+.grid-table>div {
+	/* border: 1px solid black; */
+	display: flex;
+	align-items: center;
+}
+
+.media-poster {
+	grid-row: span 5;
+	justify-content: center;
+}
+
+.media-poster img {
+	max-width: 80%;
+	border-radius: 10px;
+}
+
+.imdb-title,
+.imdb-year,
+.imdb-runtime {
+	padding: 5px;
+	grid-column: 2;
+	border-radius: 10px;
+	background-color: #bbb;
+	margin-bottom: 2px;
+	justify-content: center;
+}
+
+.imdb-genre {
+	grid-column: 5;
+	grid-row: span 3;
+	border-radius: 10px;
+	background-color: #bbb;
+	justify-content: center;
+	white-space: pre-wrap;
+}
+
+.imdb-plot {
+	grid-column: span 4;
+	border-radius: 10px;
+	background-color: #bbb;
+	margin: 10px 0 10px 0;
+	text-align: justify;
+	padding: 20px;
+}
+
+.imdb-score {
+	grid-column: span 2;
+	background-color: #222;
+	color: white;
+	justify-content: center;
+	gap: 10px;
+	border: 1px solid black;
+	border-radius: 10px 0 0 10px;
+}
+
+.rottom-score {
+	grid-column: span 2;
+	background-color: #fff;
+	justify-content: space-evenly;
+	border: 1px solid black;
+	border-radius: 0 10px 10px 0;
+}
+
+.rottom-divider {
+	width: 1px;
+	background-color: black;
+	height: 100%;
+}
+
+.rottom-score img {
+	height: 24px;
+}
+
+
+@media (max-width: 600px) {
+	.grid-table {
+		grid-template-columns: repeat(4, calc(25%));
+	}
+
+	.grid-table>div {}
+
+	.media-poster {
+		grid-row: span 3;
+		grid-column: span 2;
+	}
+
+	.media-poster img {
+	}
+
+	.imdb-title {
+		grid-column: 3 / span 2;
+		margin-bottom: 10px;
+		font-size: 1.5em;
+		font-weight: bold;
+	}
+
+	.imdb-year {
+		grid-column: 3;
+		grid-row: 2;
+		margin: 0 10px 10px 0;
+	}
+
+	.imdb-runtime {
+		grid-column: 3;
+		grid-row: 3;
+		margin: 0 10px 0 0;
+	}
+
+	.imdb-genre {
+		grid-column: 4;
+		grid-row: span 2;
+		margin: 0 0 0 10px;
+	}
+
+	.imdb-plot {}
+
+	.imdb-score,
+	.rottom-score {
+		font-size: 1.5em;
+	}
+}
