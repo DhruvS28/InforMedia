@@ -104,7 +104,7 @@ app.get('/rottom/media/:contentType/:mediaId/:year', async (req, res) => {
 		req.params.contentType === 'tvSeries' ? 'tv' : null;
 	const id = req.params.mediaId;
 	const year = req.params.year;
-	const formattedMediaId = id.replace(/:/g, '').replace(/-/g, '').replace(/ /g, '_');
+	const formattedMediaId = id.replace(/[^a-zA-Z0-9\s]/g, '').replace(/ /g, '_');
 	const formattedMediaIdWithYear = `${formattedMediaId}_${year}`;
 
 	let url;
@@ -138,13 +138,8 @@ app.get('/rottom/media/:contentType/:mediaId/:year', async (req, res) => {
 		};
 
 		let tomatometer, audienceScore;
-		if (type === 'm') {
-			tomatometer = queryMovie(8) !== '' || null ? queryMovie(8) : '-';
-			audienceScore = queryMovie(1) !== '' || null ? queryMovie(1) : '-';
-		} else if (type === 'tv') {
-			tomatometer = queryTv('criticsScore') !== '' || null ? queryTv('criticsScore') : '-';
-			audienceScore = queryTv('audienceScore') !== '' || null ? queryTv('audienceScore') : '-';
-		}
+		tomatometer = queryTv('criticsScore') !== '' || null ? queryTv('criticsScore') : '-';
+		audienceScore = queryTv('audienceScore') !== '' || null ? queryTv('audienceScore') : '-';
 
 		res.json({ "tomatometer": tomatometer, "audience_score": audienceScore, "url": url});
 	} catch (error) {

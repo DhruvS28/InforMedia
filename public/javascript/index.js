@@ -1,4 +1,3 @@
-const INPUT_LENGTH = 4;
 const MAX_RESULTS = 3;
 
 document.addEventListener('mousedown', function (event) {
@@ -11,16 +10,15 @@ document.addEventListener('mousedown', function (event) {
 		searchResults.style.display = 'none';
 	} else {
 		// Click is inside the search section, show search results
-		if (searchInput.value.length >= INPUT_LENGTH)
-			searchResults.style.display = '';
-		else
-			registerInput('');
+		if (searchInput.value.length >= 1) searchResults.style.display = '';
+		else registerInput('');
 	}
 });
 
 let submitActive = false;
 function submitForm(event) {
-	event.preventDefault(); // This prevents the default form submission behavior (page refresh)
+	// This prevents the default form submission behavior (page refresh)
+	event.preventDefault();
 
 	if (submitActive) return;
 
@@ -49,7 +47,6 @@ function fetchMediaData(media) {
 	console.log("Fetching Media");
 	submitActive = true;
 	clearTimeout(timerId);
-	// if (media.length < INPUT_LENGTH) return;
 
 	// Fetch media data from the server
 	fetch(`/search/${media}`)
@@ -91,7 +88,7 @@ function displayResults(data) {
 		searchItem.classList.add('search-item-title');
 		const searchItemYear = document.createElement('p');
 		searchItemYear.classList.add('search-item-year');
-
+		
 		try {
 			resultItemdiv.addEventListener('click', () => {
 				resultsContainer.style.display = 'none';
@@ -104,7 +101,6 @@ function displayResults(data) {
 		resultItemdiv.appendChild(searchItemYear);
 		searchItem.innerHTML = item.title;
 		searchItemYear.innerHTML = item.year;
-
 
 		resultsContainer.appendChild(resultItemdiv);
 	});
@@ -193,3 +189,14 @@ function handleFooterPosition() {
     }
 };
 document.addEventListener("DOMContentLoaded", handleFooterPosition());
+
+// getMediaInfo({
+//     "id": "tt0371746",
+//     "title": "Iron Man",
+//     "year": 2008,
+//     "type": "movie",
+//     "image": "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_UY396_CR6,0,267,396_AL_.jpg",
+//     "image_large": "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_.jpg",
+//     "api_path": "/title/tt0371746",
+//     "imdb": "https://www.imdb.com/title/tt0371746"
+// });

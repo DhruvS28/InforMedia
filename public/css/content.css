@@ -101,8 +101,9 @@
 	.imdb-title {
 		grid-column: 3 / span 2;
 		margin-bottom: 10px;
-		font-size: 1.5em;
+		font-size: 1.25em;
 		font-weight: bold;
+		text-align: center;
 	}
 
 	.imdb-year {
@@ -127,6 +128,6 @@
 
 	.imdb-score,
 	.rottom-score {
-		font-size: 1.5em;
+		font-size: 1.25em;
 	}
 }
