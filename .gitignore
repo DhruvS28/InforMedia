@@ -13,6 +13,7 @@
 !.clang-format
 !.cpplint
 !.editorconfig
+!.env
 !.eslintignore
 !.eslintrc.js
 !.eslintrc.yaml
@@ -166,3 +167,4 @@ __pycache__
 
 # === Rules for C++ development ===
 compile_commands.json
+.vercel
